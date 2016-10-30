@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="org.dudukri.persistence.TimeMapper" >
+  	
+  	<update id="timenamemodify">
+  		update tbl_timelapse set timeName = #{timeName} where timeNo = #{timeNo}
+  	</update>
+  	
+  	<update id="cameranickmodify">
+  		update tbl_camera set cameraNick = #{cameraNick} where cameraNo = #{cameraNo}
+  	</update>
+  	
+  	<update id="encoding">
+  		update tbl_timelapse set timeVideoPath = #{timeVideoPath}, timeStart = #{timeStart}, timeEnd = #{timeEnd} where timeNo = #{timeNo}
+  	</update>
+  	
+  	<select id="timeread" resultType="org.dudukri.domain.TimeLapseVO">
+		select * from tbl_timelapse a join tbl_camera b on a.cameraNo = b.cameraNo where timeStatus = 1 
+		AND timeCount <![CDATA[<]]> 2 AND a.memberId = #{memberId}
+  	</select>
+  	
+  	<select id="viewhistory" resultType="org.dudukri.domain.TimeLapseVO">
+		select * from tbl_timelapse where timeCount <![CDATA[>=]]> 2 AND memberId = #{memberId}
+	</select>
+	
+	<update id="timecount">
+		update tbl_timelapse set timeCount = +1 where timeNo = #{timeNo}
+	</update>
+	
+	<insert id="timecreate">
+		insert into tbl_timelapse(memberId, cameraNo, timeName, timeImgPath, imgCurTime, timeVideoPath, timeStart, timeEnd, temp, humidity, timeStatus) 
+		values(#{memberId}, #{cameraNo}, #{timeName}, #{timeImgPath}, #{imgCurTime}, #{timeVideoPath}, #{timeStart}, #{timeEnd}, #{temp}, #{humidity}, #{timeStatus});
+	</insert>
+	
+	<update id="qrinfoupdate">
+		update tbl_timelapse set qrOnLine = #{qrOnLine} ,qrOnPath = #{qrOnPath}, certNum = #{certNum}, deliNum = #{deliNum}
+		where timeNo = #{timeNo}
+	</update>
+
+	<update id="qrpathupdate">
+		update tbl_timelapse set qrOnPath = #{qrOnPath} ,qrOffPath = #{qrOffPath} where timeNo = #{timeNo}
+	</update>
+	
+	<select id="checkCameraId" resultType="org.dudukri.domain.TimeLapseVO">
+		select memberId, cameraNo from tbl_camera where cameraId=#{cameraId}
+	</select>
+	
+	<update id="timeImgPathModify">
+  		update tbl_timelapse set timeImgPath = #{timeImgPath}, imgCurTime=#{imgCurTime}, temp = #{temp}, humidity = #{humidity} where cameraNo = #{cameraNo}
+  	</update>
+	
+	<update id="timeStatus">
+  		update tbl_timelapse set timeStatus = #{timeStatus} where cameraNo = #{cameraNo};
+  	</update>
+  
+  </mapper>

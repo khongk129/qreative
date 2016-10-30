@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="MyItemsMapper" >
+  
+  	<insert id="insertItems">
+  		insert into tbl_item (memberId, timeNo, itemName, itemPrice, itemCount, itemExplain, itemImgPath, itemThumbImgPath, itemSummary, itemStatus, itemCategory)
+  		values (#{memberId}, #{timeNo}, #{itemName}, #{itemPrice}, #{itemCount}, #{itemExplain}, #{itemImgPath}, #{itemThumbImgPath}, #{itemSummary}, #{itemStatus}, #{itemCategory}) 
+  	</insert>
+ 		
+	<select id="listItems" resultType = "MyItemsBoardVO">
+		select * from tbl_item where deleted = 'n' AND memberId = #{memberId} order by itemNo desc limit #{limitPageNum}, #{perListNum}
+	</select> 
+	
+	<select id="viewItems" resultType = "MyItemsBoardVO">
+		select * from tbl_item where itemNo = #{itemNo}
+	</select>
+	
+	<select id="count" resultType="int">
+		select count(itemNo) from tbl_item where deleted = "n" AND memberId = #{memberId}
+	</select>
+	
+	<update id="deleteItems">
+		update tbl_item set deleted = "y" 
+		where 
+		<foreach collection="list" index="index" item="item" separator="or">
+            itemNo = #{item}
+        </foreach>
+		
+	</update>
+	
+	<update id="updateItems">
+		update tbl_item set itemName = #{itemName}, itemPrice = #{itemPrice}, itemCount=#{itemCount}, itemImgPath=#{itemImgPath}, itemThumbImgPath=#{itemThumbImgPath}, itemSummary=#{itemSummary}, itemStatus=#{itemStatus}, itemCategory = #{itemCategory} where itemNo=#{itemNo}
+	</update>		
+	
+	<select id="getCameraNick" resultType="CameraAndTimelapseInfoVO">
+		select cameraNo, cameraNick from tbl_camera where memberId=#{memberId} and deleted = "n"
+	</select>
+	
+	<select id="getTimelapseInfo" resultType="CameraAndTimelapseInfoVO">
+		select 
+			cameraNo, memberId, timeNo, timeName, timeImgPath, timeVideoPath, timeStart, timeEnd, timeStatus, qrOnline, qrOnPath, qrStatus 
+		from 
+			tbl_timelapse 
+		where 
+			cameraNo = #{cameraNo}
+		order by 
+			timeNo desc 
+		limit 
+			#{limitPageNum}, #{perListNum}
+	</select>
+	
+	<select id="timelapsData" resultType="TimeLapseVO">
+		select * from tbl_timelapse where timeNo = #{timeNo}
+	</select>
+	
+	<select id="timelapseCount" resultType="int">
+		select count(timeNo) from tbl_timelapse where cameraNo=#{cameraNo}
+	</select>
+	
+	<select id= "itemBytimeNo" resultType="MyItemsBoardVO">
+		select * from tbl_item where timeNo = #{timeNo} and deleted = "n" order by itemNo desc
+	</select>
+	
+	
+ 		
+  </mapper>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.dudukri.persistence.OrderMapper">
+
+	<select id="listRead" resultType="org.dudukri.domain.OrderVO">
+		select * from tbl_order where memberId = #{memberId}
+	</select>
+	
+	<update id="statusUpdate">
+		update tbl_order set orderStatus = #{orderStatus} where orderNo = #{orderNo}
+	</update>
+	
+	<select id="orderCheck" resultType="org.dudukri.domain.OrderVO">
+		select * from tbl_order where customerId = #{customerId} order by orderDate desc limit 1
+	</select>
+	
+	<insert id="orderCreate">
+		insert into tbl_order(itemNo, memberId, customerId, customerName, customerZipCode, customerAddress1, customerAddress2, customerPhone, orderCount, totalPrice) 
+						values(#{itemNo}, (select memberId from tbl_item where itemNo=#{itemNo}), #{customerId}, #{customerName}, #{customerZipCode}, #{customerAddress1}, #{customerAddress2}, #{customerPhone}, #{orderCount}, #{totalPrice});
+	
+	</insert>
+</mapper>
+
+	  

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.dudukri.persistence.StoreMapper">
+
+	<select id='iteminfo' resultType="org.dudukri.domain.StoreVO">
+
+		select itemNo, memberId,
+		itemName,itemPrice, itemCount, itemExplain, itemImgPath, itemSummary,
+		itemStatus,
+		(select count(customerId) from tbl_feedback where itemNo =
+		#{itemNo}) count,
+		(select avg(rating) from tbl_feedback where itemNo =
+		#{itemNo}) avg,
+		(select timeVideoPath from tbl_timelapse where timeNo =
+		(select timeNo from tbl_item where itemNo = #{itemNo})) timeLapse,
+		(select lat from tbl_member where memberId = (select memberId from
+		tbl_item where itemNo = #{itemNo})) lat,
+		(select lng from tbl_member
+		where memberId = (select memberId from tbl_item
+		where itemNo =
+		#{itemNo})) lng
+		from tbl_item where itemNo = #{itemNo} and deleted =
+		'n'
+
+	</select>
+
+	<select id='feedbacklist' resultType="org.dudukri.domain.FeedbackVO">
+	
+		select * from tbl_feedback
+		where itemNo = #{itemNo} and deleted = 'n'
+		order by regDate desc, customerId desc limit #{limitPageNum}, #{perListNum}
+		
+	</select>
+	
+	<select id="feedcount" resultType="java.lang.Integer">
+		select count(fNo) as totalCount from
+		tbl_feedback where itemNo = #{itemNo}
+	</select>
+	
+	
+	
+	<select id="bookcheck" resultType="org.dudukri.domain.FeedbackVO">
+		select count(customerId) as
+		rating from tbl_bookmark where itemNo = #{itemNo} and customerId =
+		#{customerId}
+	</select>
+
+	<insert id="bookadd">
+		insert into tbl_bookmark (customerId,itemNo) values (#{customerId},#{itemNo})
+	</insert>
+
+
+	<delete id="bookdel">
+		delete from tbl_bookmark where customerId = #{customerId} and itemNo = #{itemNo}
+	</delete>
+	
+	
+	<!-- 포인트 정보 -->
+	<select id="pointRead" resultType="org.dudukri.domain.BookmarkVO">
+		select customerId, customerName, customerEmail, customerRole, coupon, cache 
+		from tbl_point 
+		where customerId = #{customerId}
+	</select>
+	
+	<!-- 포인트 create -->
+	<insert id="pointCreate">
+		insert into tbl_point(customerId, customerName, customerEmail)
+		values(#{customerId}, #{customerName}, #{customerEmail})
+	</insert>
+	
+	<!-- 배송 정보 -->
+	<select id="deliveryCount" resultType="org.dudukri.domain.BookmarkVO">
+		select 
+		(select count(*)  from tbl_order where orderStatus = 0 and customerId = #{customerId}) payCompleted,
+		(select count(*)  from tbl_order where orderStatus = 1 and customerId = #{customerId}) deliveryReady,
+		(select count(*)  from tbl_order where orderStatus = 2 and customerId = #{customerId}) shipping,
+		(select count(*)  from tbl_order where orderStatus = 3 and customerId = #{customerId}) deliveryCompleted
+		from tbl_order where customerId = #{customerId} and deleted = 'n' group by customerId = #{customerId};
+	</select>
+
+	<!-- 즐겨찾기 리스트 -->
+	<select id="bookmarkList" resultType="org.dudukri.domain.BookmarkVO">
+		select bookNo, bookmark.customerId as consumer, item.memberId as seller, 
+		bookmark.itemNo, itemName, itemPrice, itemImgPath, itemStatus
+		from tbl_bookmark bookmark
+		inner join tbl_item item
+		on bookmark.itemNo = item.itemNo
+		where bookmark.customerId = #{customerId} and item.deleted = 'n'
+		order by bookNo desc
+		limit #{limitPageNum}, #{perListNum}
+	</select>
+	
+	<!-- 즐겨찾기 삭제 -->
+	<delete id="bookmarkDeleted">
+		delete from tbl_bookmark where bookNo = #{bookNo}
+	</delete>
+	
+	<!-- 즐켜찾기 데이터 총 갯수 -->
+	<select id="bookmarkTotalCount" resultType="java.lang.Integer">
+		select count(*) from tbl_bookmark where customerId = #{customerId};
+	</select>
+	
+	<!-- 구매 목록 -->
+	<select id='shoppingList' resultType="org.dudukri.domain.OrderVO">
+		select orders.itemNo, itemName, totalPrice, orderCount, itemSummary, itemThumbImgPath, orderNo 
+		from tbl_item item
+		inner join tbl_order orders
+		on item.itemNo = orders.itemNo
+		where orders.customerId = #{customerId} and orders.deleted = 'n' and item.deleted = 'n' 
+		order by orderNo desc
+		limit #{limitPageNum}, #{perListNum}
+	</select>
+	
+	<!-- 구매 목록 총 갯수 -->
+	<select id="shoppingListTotalCount" resultType="java.lang.Integer">
+		select count(*)
+		from tbl_item item
+		inner join tbl_order orders
+		on item.itemNo = orders.itemNo
+		where orders.customerId = #{customerId} and orders.deleted = 'n' and item.deleted = 'n'
+	</select>
+	
+	<!-- 상품평 등록 -->
+	<insert id="shoppingFeedbackCreate">
+		insert into tbl_feedback(itemNo, customerId, feedback, rating) 
+		values (#{itemNo}, #{customerId}, #{feedback}, #{rating})
+	</insert>
+
+</mapper>

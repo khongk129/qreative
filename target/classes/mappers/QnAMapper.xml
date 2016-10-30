@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.dudukri.persistence.QnAMapper">
+
+	<insert id="create">
+		insert into tbl_qna(memberId, qnaTitle, qnaContent)
+		values(#{memberId}, #{qnaTitle}, #{qnaContent})
+	</insert>
+
+	<select id="read" resultType="org.dudukri.domain.QnAVO">
+		select qnaNo, memberId, qnaTitle, qnaStatus, regdate
+		from tbl_qna
+		where memberId = #{memberId} and deleted = 'n'
+		order by qnaNo desc
+		limit #{limitPageNum}, #{perListNum}
+	</select>
+	
+	<select id="view" resultType="org.dudukri.domain.QnAVO">
+		select qnaNo, memberId, qnaTitle, qnaContent, qnaStatus, modidate 
+		from tbl_qna where qnaNo = #{qnaNo} and deleted = 'n'
+	</select>
+	
+	<update id="update">
+		update tbl_qna 
+		set qnaTitle = #{qnaTitle}, qnaContent = #{qnaContent}, modidate = now() 
+		where qnaNo = #{qnaNo}
+	</update>
+	
+	<delete id="delete">
+		update tbl_qna set deleted = 'y' 
+		where qnaNo = #{qnaNo}
+	</delete>
+	
+	<select id="count" resultType="java.lang.Integer">
+		select count(*) from tbl_qna where deleted = 'n' and memberId = #{memberId};
+	</select>
+
+
+</mapper>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.dudukri.persistence.MemberMapper">
+
+	<select id="login" resultType="org.dudukri.domain.MemberVO">
+		select memberId, memberPw, memberName
+		from tbl_member
+		where memberId = #{memberId} and memberPw = #{memberPw} and deleted = 'n'
+	</select>
+
+	<select id="read" resultType="org.dudukri.domain.MemberVO">
+		select memberName, memberId, memberPw, memberPhone, memberEmail, lat, lng, regdate
+		from tbl_member
+		where memberId = #{memberId} and deleted = 'n'
+	</select>
+
+	<update id="update">
+		update tbl_member
+		set memberPw = #{memberPw}, memberPhone = #{memberPhone}, memberEmail =
+		#{memberEmail}, lat = #{lat}, lng = #{lng}, modidate = now()
+		where memberId = #{memberId}
+	</update>
+
+	<delete id="delete">
+		update tbl_member
+		set deleted='y'
+		where memberId = #{memberId}
+	</delete>
+    
+    <select id="idcheck" resultType="java.lang.Integer">
+		select count(memberId) from tbl_member where memberId = #{id}
+	</select>
+	
+	<insert id="insertmember">
+		insert into tbl_member(memberName, memberId, memberPw, memberPhone, memberEmail) 
+		values(#{memberName}, #{memberId}, #{memberPw}, #{memberPhone}, #{memberEmail}); 
+	</insert>
+	
+
+</mapper>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.dudukri.persistence.CompanyMapper">
+
+	<select id="listall" resultType="org.dudukri.domain.MemberVO">
+		select *, (select
+		count(memberId) as cameraCount from tbl_camera where deleted='n' and
+		tbl_member.memberId = tbl_camera.memberId) as cameraCount from
+		tbl_member where deleted='n' order by regdate desc limit #{startNum} ,
+		10
+	</select>
+
+	<select id="listcamera" resultType="org.dudukri.domain.CameraVO">
+		select * from tbl_camera
+		where deleted='n'
+		order by regdate desc limit #{startNum} , 10
+	</select>
+
+	<select id="listserial" resultType="org.dudukri.domain.SerialVO">
+		select * from tbl_serial
+		where deleted='n'
+		order by regdate desc limit #{startNum} , 10
+	</select>
+	
+	<select id="listneedhelp" resultType="org.dudukri.domain.QnAVO">
+		select * from tbl_qna where deleted = 'n' order by qnaNo desc limit #{startNum}, 10;
+	</select>
+
+
+
+	<select id="mainmemberlist" resultType="org.dudukri.domain.CompanyVO">
+		select * from tbl_member
+		where deleted='n'
+		order by regdate desc limit 0 , 10
+	</select>
+
+	<select id="maincameralist" resultType="org.dudukri.domain.CompanyVO">
+		select * from tbl_camera
+		where deleted='n'
+		order by regdate desc limit 0 , 10
+	</select>
+
+	<select id="mainqnalist" resultType="org.dudukri.domain.CompanyVO">
+		select * from tbl_qna where
+		deleted='n'
+		order
+		by qnaNo desc limit 0 , 10
+	</select>
+
+
+
+
+	<select id="cameracount" resultType="java.lang.Integer">
+		select count(cameraId) from
+		tbl_camera where deleted = 'n'
+	</select>
+
+	<select id="membercount" resultType="java.lang.Integer">
+		select count(memberId) from
+		tbl_member where deleted = 'n'
+	</select>
+
+	<select id="serialcount" resultType="java.lang.Integer">
+		select count(cameraId) from
+		tbl_serial where deleted = 'n'
+	</select>
+	
+	<select id="needhelpcount" resultType="java.lang.Integer">
+		select count(qnaNo) from
+		tbl_qna where deleted = 'n'
+	</select>
+
+
+	<update id="quitmember">
+		update tbl_member set deleted = 'y' where memberId =
+		#{memberId}
+	</update>
+
+	<update id="promotemember">
+		update tbl_member set memberRole = '2' where memberId
+		= #{memberId}
+	</update>
+
+	<update id="demotemember">
+		update tbl_member set memberRole = '1' where memberId
+		= #{memberId}
+	</update>
+
+
+	<update id="deleteserial">
+		update tbl_serial set deleted = 'y' where cameraId =
+		#{cameraId}
+	</update>
+
+
+	<insert id="inputserial">
+		insert into tbl_serial(cameraId) values (#{cameraId})
+		
+	</insert>
+
+
+	<select id="totalRecentMember" resultType="java.lang.Integer">  <!-- 생성된지 7일 미만인 회원수 구하기 -->
+		select count(memberId) from
+		tbl_member where regdate > date_sub(now(),
+		interval 7 day) and deleted = 'n'
+	</select>
+
+	<select id="totalQuitMember" resultType="java.lang.Integer">  <!-- 한달간 탈퇴 회원수 구하기 -->
+		select count(memberId) from
+		tbl_member where modidate > date_sub(now(),
+		interval 30 day) and deleted = 'y'
+	</select>
+
+	<select id="totalRecentCamera" resultType="java.lang.Integer"> <!-- 생성된지 7일 미만인 카메라수 구하기 -->
+		select count(cameraNo) from
+		tbl_camera where regdate > date_sub(now(),
+		interval 7 day) and deleted = 'n'
+	</select>
+
+	<select id="totalDisabledCamera" resultType="java.lang.Integer"> <!-- 비정상 카메라수 구하기 -->
+		select count(cameraNo) from tbl_camera where cameraStatus !='정상' and
+		deleted ='n'
+	</select>
+
+	<select id="totalNotyetAnsweredQna" resultType="java.lang.Integer"> <!-- 미답변 질문수 구하기 -->
+		select count(qnaNo) from tbl_qna where qnaStatus = 'n' and deleted =
+		'n'
+	</select>
+	
+	
+	<select id="needhelpview" resultType="org.dudukri.domain.CompanyVO">
+		select * from tbl_qna where qnaNo = #{qnaNo} and deleted = 'n'
+	</select>
+	
+	<update id="qnastatus">
+		update tbl_qna 
+		set qnaStatus = 'y' 
+		where qnaNo = #{qnaNo}
+	</update>
+
+</mapper>

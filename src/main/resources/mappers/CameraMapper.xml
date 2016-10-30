@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.dudukri.persistence.CameraMapper">
+
+	<select id="idRead" resultType="org.dudukri.domain.CameraVO">
+		select * from tbl_camera where
+		deleted = 'n' and cameraId = #{cameraId}
+	</select>
+	
+	<select id="idCheck" resultType="java.lang.Boolean">
+	
+		SELECT IF(COUNT(*) > 0, 'true', 'false') 
+		FROM  tbl_camera 
+		WHERE cameraId=#{cameraId};
+		
+	</select>
+
+	<select id="read" resultType="org.dudukri.domain.CameraVO">
+		select * from tbl_camera where deleted = 'n' and cameraNo = #{cameraNo}
+	</select>
+
+	<select id="listRead" resultType="org.dudukri.domain.CameraVO">
+		select * from tbl_camera where
+		deleted = 'n' AND memberId = #{memberId}
+	</select>
+
+	<select id="readPage" resultType="org.dudukri.domain.CameraVO">
+		select * from tbl_camera where
+		deleted = 'n' AND memberId = #{memberId} order by cameraNo desc limit
+		#{page}, 10
+	</select>
+
+	<select id="count" resultType="java.lang.Integer">
+		select count(*) from tbl_camera
+		where deleted = 'n' AND memberId = #{memberId}
+	</select>
+
+	<update id="nickUpdate">
+		update tbl_camera set cameraNick = #{cameraNick}
+		where cameraNo = #{cameraNo}
+	</update>
+
+	<update id="timerUpdate">
+		update tbl_camera set cameraTimer = #{cameraTimer}
+		where cameraNo = #{cameraNo}
+	</update>
+
+	<insert id="registerCamera">
+		insert into tbl_camera (memberId, cameraId,
+		cameraNick, cameraInsdate, cameraTimer, cameraStatus)
+		values(#{memberId},#{cameraId}, #{cameraNick}, curdate(),
+		#{cameraTimer}, #{cameraStatus});
+	</insert>
+
+	<update id="deleteCamera">
+		update tbl_camera set deleted = 'y' where cameraNo =
+		#{cameraNo}
+	</update>
+
+	<update id="statusUpdate">
+		update tbl_camera set cameraStatus = #{cameraStatus}
+		where cameraNo = #{cameraNo}
+	</update>
+
+	<select id="cameraNumcheck" resultType="java.lang.Integer">
+		select cameraNo from
+		tbl_camera where cameraId = #{cameraId};
+	</select>
+	
+</mapper>
+
+	  
